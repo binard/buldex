@@ -3,6 +3,8 @@ on:
   push:
     branches:
     - master
+    paths:
+      - "/src/back"
 env:
   AZURE_FUNCTIONAPP_NAME: BuldexBackApp
   AZURE_FUNCTIONAPP_PACKAGE_PATH: ./published
