@@ -1,3 +1,6 @@
-<ul>
-    <li *ngFor="let trip of tripItems$ | async">{{trip.city.name}}</li>
-</ul>
+<mat-selection-list [multiple]="false" (selectionChange)="onTripSelectedChange($event)" #trips>
+    <ng-container *ngFor="let trip of tripItems$ | async">
+        <mat-list-option [value]="trip.id">{{trip.city.name}}</mat-list-option>
+        <mat-divider></mat-divider>
+    </ng-container>
+</mat-selection-list>

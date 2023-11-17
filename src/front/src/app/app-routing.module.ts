@@ -1,17 +1,15 @@
 import { NgModule } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
+import { TripListComponent } from './trips/trip-list/trip-list.component';
+import { BuldexBrowserComponent } from './buldex-browser/buldex-browser.component';
 
-import { routes } from './app.routes';
-import { CommonModule } from '@angular/common';
+const routes: Routes = [
+  { path: 'trips', component: BuldexBrowserComponent },
+  { path: '', redirectTo: '/trips', pathMatch: 'full' },
+];
 
 @NgModule({
-  declarations: [],
-  imports: [
-    CommonModule,
-    RouterModule.forRoot(routes)
-  ],
-  exports:[
-    RouterModule
-  ]
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
 })
 export class AppRoutingModule { }
