@@ -5,14 +5,23 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using Buldex.Infrastructure.Datas;
+using Microsoft.EntityFrameworkCore;
 
 var builder = new HostBuilder()
     .ConfigureFunctionsWorkerDefaults();
+
+
 
 builder.ConfigureServices(services =>
 {
     services.AddTransient<ITripRepository, TripRepository>();
     services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetAllTripsQuery).Assembly));
+    services.AddDbContext<BuldexDbContext>(options =>
+    {
+        var connectionString = Environment.GetEnvironmentVariable("SQLAZURECONNSTR_Buldex");
+        options.UseSqlServer(connectionString);
+    });
     services.Configure<JsonSerializerOptions>(options =>
     {
         options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;

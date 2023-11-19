@@ -1,11 +1,20 @@
 ﻿using Buldex.Application.Dtos;
 using Buldex.Domain;
 using Buldex.Domain.Repositories;
+using Buldex.Infrastructure.Datas;
+using Microsoft.EntityFrameworkCore;
 
 namespace Buldex.Infrastructure.Repositories
 {
     public class TripRepository : ITripRepository
     {
+        private readonly BuldexDbContext _dbContext;
+
+        public TripRepository(BuldexDbContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
+
         public Task AddTrip(Trip trip)
         {
             throw new NotImplementedException();
@@ -13,18 +22,23 @@ namespace Buldex.Infrastructure.Repositories
 
         public async Task<IList<TripItemSummaryDto>> GetAllTrips()
         {
-            var result = new List<TripItemSummaryDto>()
-            {
-                new TripItemSummaryDto("49400-20190330", new CityDto("49400", "Saumur"), new DateTime(2019, 3, 30)),
-                new TripItemSummaryDto("76000-20190919", new CityDto("76000", "Rouen"), new DateTime(2019, 9, 19)),
-            };
-
-            return result;
+            return await _dbContext.Trips
+                                   .Include(t => t.City)
+                                   .OrderBy(t => t.Date)
+                                   .Select(t => new TripItemSummaryDto(t.Id, new CityDto(t.City.ZipCode, t.City.Name), t.Date))
+                                   .ToListAsync();
         }
 
         public async Task<Trip?> GetTripById(string id)
         {
-            return (await GetAllTrips()).Where(t => t.Id == id).Select(t => Trip.CreateTrip(new City(t.City.ZipCode, t.City.Name), t.Date)).FirstOrDefault();
+            var trip = await _dbContext.Trips
+                                       .Include(t => t.City)
+                                       .SingleOrDefaultAsync(t => t.Id == id);
+            if(trip == null)
+            {
+                return null;
+            }
+            return Trip.CreateTrip(new City(trip.City.ZipCode, trip.City.Name), trip.Date);
         }
     }
 }
